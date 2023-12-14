@@ -1,20 +1,23 @@
 -- TEMPORARY --
-local NUM_SECT = #loadSectors / 6
+local NUM_SECT = (#loadSectors / 6) - 1 -- -1 to fit on index 0
 -- local NUM_SECT = #LevelMan.sectors / 6
 
-
 -- [!] This would be a struct (sectors[30])
--- Object built of walls
-sectors = {}
-for i = 0, NUM_SECT do -- Create all sectors
-	sectors[i] = {
+sectors = {} -- Object built of walls
+
+-- Load sectors and walls --
+local v1, v2 = 1, 1 -- [!] Since Lua table index starts with 1 replace '1' with '0'
+for s = 0, NUM_SECT do -- Create all sectors
+	-- [!] Instead of this, make it like -> sectors[s].ws = ... / sectors[s].we = ... and etc
+	
+	sectors[s] = {
 		-- Wall number, start and end
-		ws = 0,
-		we = 0,
+		ws = loadSectors[v1 + 0], -- Wall start
+		we = loadSectors[v1 + 1], -- Wall end
 
 		-- Height of bottom and top
-		z1 = 0,
-		z2 = 0,
+		z1 = loadSectors[v1 + 2], -- Sector bottom height
+		z2 = loadSectors[v1 + 3] - loadSectors[v1 + 2], -- Sector top height
 
 		-- Center position
 		-- x = 0,
@@ -23,31 +26,18 @@ for i = 0, NUM_SECT do -- Create all sectors
 		d = 0, -- Add y distances to sort drawing order
 
 		-- Bottom and top color
-		c1 = 0,
-		c2 = 0,
+		c1 = loadSectors[v1 + 4], -- Bottom color
+		c2 = loadSectors[v1 + 5], -- Top Color
 
 		surf = {}, -- To hold points for surface / [!] int surf[WIDTH]
 		surface = nil -- Is there a surface to draw
 	}
-end
-
--- Load sectors and walls --
-local v1, v2 = 1, 1 -- [!] Since Lua table index starts with 1 replace '1' with '0'
--- [!] Remove "- 1" on each for-loop declaration
-for s = 0, NUM_SECT - 1 do
-	local sector = sectors[s]
-	sector.ws = loadSectors[v1 + 0] -- Wall start
-	sector.we = loadSectors[v1 + 1] -- Wall end
-	sector.z1 = loadSectors[v1 + 2] -- Sector bottom height
-	sector.z2 = loadSectors[v1 + 3] - sector.z1  -- Sector top height
-	sector.c1 = loadSectors[v1 + 4]
-	sector.c2 = loadSectors[v1 + 5]
 
 	-- [!] Remove "- 1"
 	v1 = v1 + 6 -- Advance to next
 
 	-- Make sectors wall
-	for w = sector.ws, sector.we - 1 do
+	for w = sectors[s].ws, sectors[s].we - 1 do
 		local wall = walls[w]
 
 		wall.x1 = loadWalls[v2 + 0] -- Bottom x1
@@ -59,6 +49,8 @@ for s = 0, NUM_SECT - 1 do
 		v2 = v2 + 5 -- Advance to next
 	end
 end
+
+print(#sectors)
 -- TEMPORARY --
 
 
@@ -167,8 +159,9 @@ function sectors.draw()
 	-- bubblesort(sectors, sectors.NUM_SECT)
 	quicksort(sectors, 0, NUM_SECT)
 
+
 	-- [!] Remove "- 1" on each for-loop declaration
-	for s = 0, NUM_SECT - 1 do -- Each sector
+	for s = 0, NUM_SECT do -- Each sector
 		local sector = sectors[s]
 		sector.d = 0 -- Clear distance
 		sector.surface = sectors.getSuface(sector)

@@ -1,5 +1,5 @@
 # 3D-Rendering
-This is an attempt to create a **3D-Rendering** based on **Doom**
+This is an attempt to create a **3D-Rendering** inspired on **Doom**
 
 ![demo](media/demo.gif)
 
