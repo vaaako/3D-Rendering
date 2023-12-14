@@ -29,7 +29,7 @@ OBS.: Where Y is originally '+' it changes to '-'
 - [X] Basic Rendering
 - [X] Wall and **Top/Bottom Surfaces**
 - [X] Textures
-- [ ] Load levels from **Level Editor**
+- [ ] Load levels from **File**
 - [ ] Billboarding
 
 

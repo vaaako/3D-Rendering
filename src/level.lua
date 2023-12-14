@@ -39,3 +39,76 @@ loadWalls = {
 	256, 288, 256, 192, { 110 , 50, 0 },
 }
 -- TEMPORARY --
+
+
+-- Get all lines form a file
+local function linesFrom(file)
+	local lines = {}
+	for line in io.lines(file) do
+		table.insert(lines, line)
+	end
+
+	return lines
+end
+
+-- Split and insert to the table
+local function splitTo(tab, input)
+	for number in input:gmatch("%S+") do
+		-- [!] TEMPORARY [!] --
+		-- [!] This is temporary to choose the colors just until I change the level editor
+		local n = tonumber(number)
+		if n == 0 or n == 1 then
+			math.randomseed(os.time())
+			n = math.random(100, 255)
+		end
+		-- [!] TEMPORARY [!] --
+
+		-- table.insert(tab, tonumber(number))
+		table.insert(tab, n)
+	end
+end
+
+local function getLines(tab, n, lines)
+	-- Remove first line to get next number of lines
+	table.remove(lines, 1) -- This is the line of "Number of X"
+
+	local str = ""
+	for _ = 1, n  do
+		-- table.insert(tab, table.remove(lines, 1))
+		str = str .. table.remove(lines, 1) .. " "
+	end
+
+	return str
+end
+
+
+
+LevelMan = {
+	sectors = {},
+	walls = {},
+
+	path = "",
+	lines = {},
+
+	new = function(self, path)
+		self.path = path
+		self.lines = linesFrom(self.path)
+		return self
+	end,
+
+	--[[
+		First line of the file is the "Number of sectors"
+		Then get all lines (getLines) and put on a single string
+
+		This single string is passed to "splitTo", so it splits the string
+		of number in items to insert to the table
+	]]
+	-- function levelMan:loadLevel(self, sectors, walls, file)
+	loadLevel = function (self)
+		splitTo(self.sectors, getLines(self.sectors, tonumber(self.lines[1]), self.lines))
+		splitTo(self.walls, getLines(self.walls, tonumber(self.lines[1]), self.lines))
+
+		-- The remaining line is the player's position
+		-- print("Player's position: " .. self.lines[2]) -- x, y, z, a, l
+	end
+}
