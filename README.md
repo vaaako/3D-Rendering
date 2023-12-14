@@ -1,7 +1,7 @@
 # 3D-Rendering
 This is an attempt to create a **3D-Rendering** based on **Doom**
 
-![media/demo.gif](demo)
+![demo](media/demo.gif)
 
 
 I want this engine to be *"re-writable"* using other languages and frameworks.
