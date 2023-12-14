@@ -8,8 +8,7 @@ sectors = {} -- Object built of walls
 -- Load sectors and walls --
 local v1, v2 = 1, 1 -- [!] Since Lua table index starts with 1 replace '1' with '0'
 for s = 0, NUM_SECT do -- Create all sectors
-	-- [!] Instead of this, make it like -> sectors[s].ws = ... / sectors[s].we = ... and etc
-	
+	-- [!] Instead of this, make it like -> sectors[s].ws = ... / sectors[s].we = ... and etc	
 	sectors[s] = {
 		-- Wall number, start and end
 		ws = loadSectors[v1 + 0], -- Wall start
@@ -38,13 +37,17 @@ for s = 0, NUM_SECT do -- Create all sectors
 
 	-- Make sectors wall
 	for w = sectors[s].ws, sectors[s].we - 1 do
-		local wall = walls[w]
+		walls[w] = {
+			-- Bottom line point 1
+			x1 = loadWalls[v2 + 0], -- Bottom x1
+			y1 = loadWalls[v2 + 1], -- Bottom y1
 
-		wall.x1 = loadWalls[v2 + 0] -- Bottom x1
-		wall.y1 = loadWalls[v2 + 1] -- Bottom y1
-		wall.x2 = loadWalls[v2 + 2] -- Top x2
-		wall.y2 = loadWalls[v2 + 3] -- Top y2
-		wall.c  = loadWalls[v2 + 4]
+			-- Bottom line point 2
+			x2 = loadWalls[v2 + 2], -- Top x2
+			y2 = loadWalls[v2 + 3], -- Top x1
+
+			c = loadWalls[v2 + 4] -- Color
+		}
 
 		v2 = v2 + 5 -- Advance to next
 	end
