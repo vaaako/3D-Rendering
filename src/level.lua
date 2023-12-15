@@ -111,12 +111,14 @@ LevelMan = {
 				d = 0, -- Add y distances to sort drawing order
 
 				-- Surfaces
-				-- st = tonumber(file:read("*n")), -- Surface texture
-				-- sc = tonumber(file:read("*n")), -- Surface scale
+				st = tonumber(file:read("*n")), -- Surface texture
+				sc = tonumber(file:read("*n")), -- Surface scale
 
+				-- TEMPORARY --
 				-- Bottom and top color
-				c1 = tonumber(file:read("*n")), -- Bottom color
-				c2 = tonumber(file:read("*n")), -- Top Color
+				c1 = { math.random(1, 255), math.random(1, 255), math.random(255) }, -- Bottom color
+				c2 = { math.random(1, 255), math.random(1, 255), math.random(255) }, -- Top Color
+				-- TEMPORARY -- 
 
 				surf = {}, -- To hold points for surface / [!] int surf[WIDTH]
 				surface = nil -- Is there a surface to draw
@@ -145,8 +147,9 @@ LevelMan = {
 
 				shade = tonumber(file:read("*n")), -- Shade (shadow)
 
-				-- TEMPORARY
+				-- TEMPORARY --
 				c = { math.random(1, 255), math.random(1, 255), math.random(255) }
+				-- TEMPORARY --
 			}
 
 			local wall = level.walls[w]

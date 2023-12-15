@@ -25,7 +25,7 @@ OBS.: Where Y is originally '+' it changes to '-'
 local keysPressed = {}
 
 function love.load()
-	level = LevelMan:new("resources/levels/level.txt")
+	level = LevelMan:new("resources/levels/level.h")
 	level:loadLevel()
 	-- level:compileLevel()
 end
