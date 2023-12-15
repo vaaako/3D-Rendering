@@ -166,7 +166,7 @@ function sectors.draw()
 		sector.d = 0 -- Clear distance
 		sector.surface = sectors.getSuface(sector)
 
-		for loop = 0, 2 do
+		for loop = 0, 1 do -- [!] 0 -> 2 (this is because of the way lua loops works)
 			for w = sector.ws, sector.we - 1 do -- Each wall of that sector
 				local wall = walls[w]
 
