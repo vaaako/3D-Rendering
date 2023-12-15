@@ -2,19 +2,7 @@
 -- [!] This would be a struct (walls[30])
 local NUM_WALL = #loadWalls / 5
 walls = {}
-for i = 0, NUM_WALL do
-	walls[i] = {
-		-- Bottom line point 1
-		x1 = 0,
-		y1 = 0,
 
-		-- Bottom line point 2
-		x2 = 0,
-		y2 = 0,
-
-		c = 0 -- Color
-	}
-end
 
 -- Test only
 local TEXTURE = TexMan:new('resources/textures/1.png')

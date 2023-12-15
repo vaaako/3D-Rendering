@@ -38,19 +38,21 @@ for s = 0, NUM_SECT do -- Create all sectors
 
 	-- Make sectors wall
 	for w = sectors[s].ws, sectors[s].we - 1 do
-		local wall = walls[w]
+		walls[w] = {
+			-- Bottom line point 1
+			x1 = loadWalls[v2 + 0], -- Bottom x1
+			y1 = loadWalls[v2 + 1], -- Bottom y1
 
-		wall.x1 = loadWalls[v2 + 0] -- Bottom x1
-		wall.y1 = loadWalls[v2 + 1] -- Bottom y1
-		wall.x2 = loadWalls[v2 + 2] -- Top x2
-		wall.y2 = loadWalls[v2 + 3] -- Top y2
-		wall.c  = loadWalls[v2 + 4]
+			-- Bottom line point 2
+			x2 = loadWalls[v2 + 2],  -- Top x2
+			y2 = loadWalls[v2 + 3],  -- Top y2 line point 2
+
+			c = loadWalls[v2 + 4] -- Color
+		}
 
 		v2 = v2 + 5 -- Advance to next
 	end
 end
-
-print(#sectors)
 -- TEMPORARY --
 
 
