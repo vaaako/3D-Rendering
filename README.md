@@ -1,4 +1,11 @@
 # 3D-Rendering
+# This branch is the base only
+This branch only contains the base features, to be a start point if you are
+ porting this code to another language or framework
+
+After porting this branch you can try to port the `main` branch
+
+# About
 This is an attempt to create a **3D-Rendering** inspired on **Doom**
 
 ![demo](media/demo.gif)
