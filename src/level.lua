@@ -1,3 +1,14 @@
+--[[
+	[!] I will not be convering this file so much, but is pretty basic
+	Just reading the code below you can get it
+	- Read the level file
+	- Get the sectors and walls info
+	- Pass to the original array (in this case I'm making another one, but in other language you might want to use the original one)
+		+ Like it was done with "loadSectors" and "loadWalls", the "value assigment" part ("loadLevel" here)
+		+ You can check for next number until the end of the file (like is done here and can be done in C) or read line by line and split the values
+]]
+
+
 -- TEMPORARY --
 loadSectors = { 
 	-- wall start, wall end, z1 height, z2 height, bottom color, top color
@@ -42,73 +53,109 @@ loadWalls = {
 
 
 -- Get all lines form a file
-local function linesFrom(file)
-	local lines = {}
-	for line in io.lines(file) do
-		table.insert(lines, line)
-	end
 
-	return lines
-end
 
--- Split and insert to the table
-local function splitTo(tab, input)
-	for number in input:gmatch("%S+") do
-		-- [!] TEMPORARY [!] --
-		-- [!] This is temporary to choose the colors just until I change the level editor
-		local n = tonumber(number)
-		if n == 0 or n == 1 then
-			math.randomseed(os.time())
-			n = math.random(100, 255)
-		end
-		-- [!] TEMPORARY [!] --
 
-		-- table.insert(tab, tonumber(number))
-		table.insert(tab, n)
-	end
-end
 
-local function getLines(tab, n, lines)
-	-- Remove first line to get next number of lines
-	table.remove(lines, 1) -- This is the line of "Number of X"
 
-	local str = ""
-	for _ = 1, n  do
-		-- table.insert(tab, table.remove(lines, 1))
-		str = str .. table.remove(lines, 1) .. " "
-	end
-
-	return str
-end
 
 
 
 LevelMan = {
+	-- [!] This two below would be a struct (sectors[30] and walls[30])
 	sectors = {},
 	walls = {},
 
+	NUM_SECT = 0,
+	NUM_WALL = 0,
+
 	path = "",
-	lines = {},
+
 
 	new = function(self, path)
 		self.path = path
-		self.lines = linesFrom(self.path)
 		return self
 	end,
 
-	--[[
-		First line of the file is the "Number of sectors"
-		Then get all lines (getLines) and put on a single string
 
-		This single string is passed to "splitTo", so it splits the string
-		of number in items to insert to the table
-	]]
-	-- function levelMan:loadLevel(self, sectors, walls, file)
 	loadLevel = function (self)
-		splitTo(self.sectors, getLines(self.sectors, tonumber(self.lines[1]), self.lines))
-		splitTo(self.walls, getLines(self.walls, tonumber(self.lines[1]), self.lines))
+		local file = io.open(self.path, "r")
+		if file == nil then
+			print("Error: opening " .. file)
+			os.exit(1)
+		end
+
+		-- Get next number (first number wich is the number of sectors)
+		self.NUM_SECT = tonumber(file:read("*n")) -- *n -> Get next number
+
+		if self.NUM_SECT == nil then
+			print("Error: level file content is incorrect [" .. self.path .. "]")
+			os.exit(1)
+		end
+
+		print("NUM_SECT", self.NUM_SECT)
+		-- [!] Remove -1 from each for loop (I made this so the loop runs the right amount)
+		for s = 0, self.NUM_SECT - 1 do
+			-- print("RUN!")
+
+			-- [!] Instead of this, make it like -> sectors[s].ws = ...; sectors[s].we = ...; and etc
+			level.sectors[s] = {
+				-- Wall number, start and end
+				ws = tonumber(file:read("*n")), -- Wall start
+				we = tonumber(file:read("*n")), -- Wall end
+
+				-- Height of bottom and top
+				z1 = tonumber(file:read("*n")), -- Sector bottom height
+				z2 = tonumber(file:read("*n")), -- Sector top height
+
+				d = 0, -- Add y distances to sort drawing order
+
+				-- Surfaces
+				-- st = tonumber(file:read("*n")), -- Surface texture
+				-- sc = tonumber(file:read("*n")), -- Surface scale
+
+				-- Bottom and top color
+				c1 = tonumber(file:read("*n")), -- Bottom color
+				c2 = tonumber(file:read("*n")), -- Top Color
+
+				surf = {}, -- To hold points for surface / [!] int surf[WIDTH]
+				surface = nil -- Is there a surface to draw
+			}
+
+			local sector = level.sectors[s]
+			print(sector.ws, sector.we, sector.z1, sector.z2, sector.c1, sector.c2)
+		end
+
+		-- [!] Remove -1
+		self.NUM_WALL = tonumber(file:read("*n"))
+		for w = 0, self.NUM_WALL - 1 do -- Number of walls
+			level.walls[w] = {
+				-- Bottom line point 1
+				x1 = tonumber(file:read("*n")), -- Bottom x1
+				y1 = tonumber(file:read("*n")), -- Bottom y1
+
+				-- Bottom line point 2
+				x2 = tonumber(file:read("*n")), -- Top x2
+				y2 = tonumber(file:read("*n")), -- Top x1
+
+				-- Textures
+				wt = tonumber(file:read("*n")), -- Wwall texture
+				u = tonumber(file:read("*n")), -- Texture U (X)
+				v = tonumber(file:read("*n")), -- Texture V (Y)
+
+				shade = tonumber(file:read("*n")), -- Shade (shadow)
+
+				-- TEMPORARY
+				c = { math.random(1, 255), math.random(1, 255), math.random(255) }
+			}
+
+			local wall = level.walls[w]
+			print(w, "Wall", wall.x1, wall.y1, wall.x2, wall.y2, wall.c)
+		end
+
+
 
 		-- The remaining line is the player's position
 		-- print("Player's position: " .. self.lines[2]) -- x, y, z, a, l
-	end
+	end	
 }

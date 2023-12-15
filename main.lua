@@ -19,13 +19,15 @@ OBS.: Where Y is originally '+' it changes to '-'
 	+ In fact this just changes the order of drawing sectors and movement
 - Almost all variables are Integer, except the ones with [F!]
 	+ This is important to know because there are some operations that if uses float will cause bugs
-- General warnings on converting to OpenGL are prefixed with [!] followed by the "what do in OpenGL"
+- General warnings on converting to OpenGL are prefixed with [!] followed by the "what do in OpenGL". Most of it are index fix (why start with 1 lua?????/)
 --]]
 
 local keysPressed = {}
 
 function love.load()
-
+	level = LevelMan:new("resources/levels/level.txt")
+	level:loadLevel()
+	-- level:compileLevel()
 end
 
 function love.update(dt)
@@ -40,7 +42,7 @@ function love.draw()
 	love.graphics.clear(0.3, 0.3, 0.3)
 
 
-	sectors.draw()
+	SectMan.draw(level)
 
 	-- Print with shadow (this is not using many CPU and Memory so I can do that)
 	love.graphics.setColor(0, 0, 0)
@@ -59,6 +61,12 @@ function love.keypressed(key, scancode, isrepeat)
 	if key == "escape" then
 		love.window.close()
 		love.event.quit()
+	end
+
+	-- RELOAD LEVEL --
+	if key == "return" then
+		print("RELOADED")
+		level:loadLevel()
 	end
 
 	keysPressed[key] = true

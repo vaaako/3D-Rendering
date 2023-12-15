@@ -16,32 +16,34 @@ for i = 0, 360 do
 end
 
 
-function partition(sectors, low, numSect)
-	local pivot = sectors[numSect].d
-	local i = low - 1
+function quicksort(sectors, low, high)
+	if low < high then
+		local pivotIndex = partition(sectors, low, high)
+		quicksort(sectors, low, pivotIndex - 1)
+		quicksort(sectors, pivotIndex + 1, high)
+	end
+end
 
-	for j = low, numSect - 1 do
+function partition(sectors, low, high)
+	-- Based on distance (get highest distance)
+	local pivot = sectors[high].d -- [!] Remove -1
+	local i = low - 1 -- Index of smaller element
+
+	for j = low, high - 1 do
 		if sectors[j].d >= pivot then
 			i = i + 1
 			sectors[i], sectors[j] = sectors[j], sectors[i]
 		end
 	end
 
-	sectors[i + 1], sectors[numSect] = sectors[numSect], sectors[i + 1]
+	sectors[i + 1], sectors[high] = sectors[high], sectors[i + 1]
 	return i + 1
 end
 
-function quicksort(sectors, low, numSect)
-	if low < numSect then
-		local pivotIndex = partition(sectors, low, numSect)
-		quicksort(sectors, low, pivotIndex - 1)
-		quicksort(sectors, pivotIndex + 1, numSect)
-	end
-end
 
-function bubblesort(sectors, numSect)
-	for s = 0, numSect - 1 do
-		for w = 0, numSect - s do
+function bubblesort(sectors, high)
+	for s = 0, high - 1 do
+		for w = 0, high - s - 1 do
 			if sectors[w].d < sectors[w + 1].d then
 				local st = sectors[w]
 				sectors[w] = sectors[w + 1]

@@ -1,11 +1,8 @@
--- TEMPORARY --
--- [!] This would be a struct (walls[30])
-local NUM_WALL = #loadWalls / 5
-walls = {}
+WallMan = {} -- Wall Manager (this is just to agroup some functions)
 
+-- TEMPORARY --
 -- Test only
 local TEXTURE = TexMan:new('resources/textures/1.png')
-
 -- TEMPORARY --
 
 
@@ -25,7 +22,7 @@ end
 
 -- Draw Vertical lines
 -- [!] All variables here would be integer (that's why math.floor some)
-function walls.draw(x1, x2, b1, b2, t1, t2, color, sector)
+function WallMan.draw(x1, x2, b1, b2, t1, t2, color, sector)
 	-- Difference in distance
 	local dyb = b2 - b1 -- Y distance of bottom line
 	local dyt = t2 - t1 -- Y distance of top line
@@ -97,12 +94,14 @@ function walls.draw(x1, x2, b1, b2, t1, t2, color, sector)
 		end
 
 		-- Normal
-		setColorWithShadow(color, sector.d)
-		-- setColor(color)
+		-- print(color)
+		-- setColorWithShadow(color, sector.d)
+		setColor(color)
 
 
-		-- love.graphics.rectangle("fill", x, y1, 1, y2 - y1)
+		love.graphics.rectangle("fill", x, y1, 1, y2 - y1)
 		-- love.graphics.line(x, y1, x, y2)
+		
 
 		-- This bellow can be used for billboarding --
 		-- local width = x2 - x1

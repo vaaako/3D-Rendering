@@ -29,8 +29,9 @@ OBS.: Where Y is originally '+' it changes to '-'
 - [X] Basic Rendering
 - [X] Wall and **Top/Bottom Surfaces**
 - [X] Textures
-- [ ] Load levels from **File**
+- [X] Load levels from **File**
 - [ ] Billboarding
+- [ ] More...
 
 
 # Running
@@ -38,3 +39,6 @@ Install `Love2D` and run it from the root directory
 
 # Credits
 Inspired by [3DSage](https://github.com/3DSage/OpenGL-Doom_tutorial_part_2)
+
+Using his **Level Editor** [Grid2D](https://github.com/3DSage/OpenGL-Doom_tutorial_part_2/blob/main/Grid2D.c)
+

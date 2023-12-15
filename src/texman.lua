@@ -1,3 +1,8 @@
+--[[
+	[!] This will change on language to language but since I am taking C as reference
+	This would be a struct (textures[64] or any number of textures you want) to store: width, height, name (to query from file)
+]]
+
 TexMan = {
 	path = nil,
 	image = nil,

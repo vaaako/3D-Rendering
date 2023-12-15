@@ -1,63 +1,4 @@
--- TEMPORARY --
-local NUM_SECT = (#loadSectors / 6) - 1 -- -1 to fit on index 0
--- local NUM_SECT = #LevelMan.sectors / 6
-
--- [!] This would be a struct (sectors[30])
-sectors = {} -- Object built of walls
-
--- Load sectors and walls --
-local v1, v2 = 1, 1 -- [!] Since Lua table index starts with 1 replace '1' with '0'
-for s = 0, NUM_SECT do -- Create all sectors
-	-- [!] Instead of this, make it like -> sectors[s].ws = ... / sectors[s].we = ... and etc	
-	sectors[s] = {
-		-- Wall number, start and end
-		ws = loadSectors[v1 + 0], -- Wall start
-		we = loadSectors[v1 + 1], -- Wall end
-
-		-- Height of bottom and top
-		z1 = loadSectors[v1 + 2], -- Sector bottom height
-		z2 = loadSectors[v1 + 3] - loadSectors[v1 + 2], -- Sector top height
-
-		-- Center position
-		-- x = 0,
-		-- y = 0,
-
-		d = 0, -- Add y distances to sort drawing order
-
-		-- Bottom and top color
-		c1 = loadSectors[v1 + 4], -- Bottom color
-		c2 = loadSectors[v1 + 5], -- Top Color
-
-		surf = {}, -- To hold points for surface / [!] int surf[WIDTH]
-		surface = nil -- Is there a surface to draw
-	}
-
-	-- [!] Remove "- 1"
-	v1 = v1 + 6 -- Advance to next
-
-	-- Make sectors wall
-	for w = sectors[s].ws, sectors[s].we - 1 do
-		walls[w] = {
-			-- Bottom line point 1
-			x1 = loadWalls[v2 + 0], -- Bottom x1
-			y1 = loadWalls[v2 + 1], -- Bottom y1
-
-			-- Bottom line point 2
-			x2 = loadWalls[v2 + 2], -- Top x2
-			y2 = loadWalls[v2 + 3], -- Top x1
-
-			c = loadWalls[v2 + 4] -- Color
-		}
-
-		v2 = v2 + 5 -- Advance to next
-	end
-end
-
-print(#sectors)
--- TEMPORARY --
-
-
-
+SectMan = {} -- Sector Manager (this is just to agroup some functions)
 
 
 
@@ -68,10 +9,11 @@ end
 
 
 
+
 -- Clip line
 -- Change the intersection value (between wall) either to 0 or 1
 -- [F!] Function variables (da, db, d etc)
-function sectors.clipBehindPlayer(x1, y1, z1, x2, y2, z2) -- [!] x1, y1, z1 as pointers
+function SectMan.clipBehindPlayer(x1, y1, z1, x2, y2, z2) -- [!] x1, y1, z1 as pointers
 	local da = y1 -- Distance plane -> point a
 	local db = y2 -- Distance plane -> point b
 
@@ -96,7 +38,7 @@ function sectors.clipBehindPlayer(x1, y1, z1, x2, y2, z2) -- [!] x1, y1, z1 as p
 end
 
 -- [F!] CS, SN
-function sectors.makeWorld(x1, y1, x2, y2, sector)
+function SectMan.makeWorld(x1, y1, x2, y2, sector)
 	-- [!] Remove radians convertion
 	local CS, SN = MATH_COS[player.a], MATH_SIN[player.a]
 
@@ -134,7 +76,7 @@ function sectors.makeWorld(x1, y1, x2, y2, sector)
 end
 
 
-function sectors.getSuface(sector)
+function SectMan.getSuface(sector)
 	-- Just draw surface if visible
 	if player.z < sector.z1 then -- Bottom surface
 		-- If player is bellow that sectors Z value, draw bottom surface
@@ -147,32 +89,34 @@ function sectors.getSuface(sector)
 	end
 end
 
-function sectors.canDrawBack(sector)
+function SectMan.canDrawBack(sector)
 	return player.z < sector.z1 or player.z > sector.z2
 end
 
 
-function sectors.draw()
+function SectMan.draw(level)
 	-- Order sectors by distance (to not clip)
 	--[[
 		This is the wrong way of doing this, since all will be rendering at the same time
 		(except what is behind player since there is statement below preventing this)
 		I need to render only what is visible
 	]]
-	-- bubblesort(sectors, sectors.NUM_SECT)
-	quicksort(sectors, 0, NUM_SECT)
+	-- bubblesort(level.sectors, level.NUM_SECT - 1)
+	local NUM_SECT = level.NUM_SECT - 1 -- -1 To fit on index 0
+	quicksort(level.sectors, 0, NUM_SECT)
 
 
-	-- [!] Remove "- 1" on each for-loop declaration
-	for s = 0, NUM_SECT do -- Each sector
-		local sector = sectors[s]
+	-- Draw Each sector	
+	-- [!] Remove - 1 from for-loop below (this is because of the way lua loops works)
+	for s = 0, NUM_SECT do  -- -1 = Not to exceed the total number of sectors
+		local sector = level.sectors[s]
+
 		sector.d = 0 -- Clear distance
-		sector.surface = sectors.getSuface(sector)
+		sector.surface = SectMan.getSuface(sector)
 
-		for loop = 0, 2 do
+		for loop = 0, 1 do -- [!] 0 -> 2 (this is because of the way lua loops works)
 			for w = sector.ws, sector.we - 1 do -- Each wall of that sector
-				local wall = walls[w]
-
+				local wall = level.walls[w]
 
 				-- Offset bottom 2 points by player
 				local x1 = wall.x1 - player.x
@@ -182,12 +126,12 @@ function sectors.draw()
 				local y2 = wall.y2 + player.y -- [Y!] '-'
 
 				-- Swap variables draws the wall back / Show walls from behind, it is necessary for top and bottom surface
-				if loop == 0 and sectors.canDrawBack(sector) then -- Arg #2 -> Prevent from drawing all the time
+				if loop == 0 and SectMan.canDrawBack(sector) then -- Arg #2 -> Prevent from drawing all the time
 					x1, x2 = x2, x1
 					y1, y2 = y2, y1
 				end
 
-				local wx, wy, wz = sectors.makeWorld(x1, y1, x2, y2, sector)
+				local wx, wy, wz = SectMan.makeWorld(x1, y1, x2, y2, sector)
 
 			    -- Store the distance from the camera to the wall
 				sector.d = sector.d + distance(0,0, (wx[0] + wx[1]) / 2, (wy[0] + wy[1]) / 2) -- w = x1, x2, y1, y2
@@ -207,14 +151,14 @@ function sectors.draw()
 
 				-- Point 1 behing player, clip
 				if wy[0] < 1 then
-					wx[0], wy[0], wz[0] = sectors.clipBehindPlayer(wx[0], wy[0], wz[0],  wx[1], wy[1], wz[1]) -- Bottom line
-					wx[2], wy[2], wz[2] = sectors.clipBehindPlayer(wx[2], wy[2], wz[2],  wx[3], wy[3], wz[3]) -- Top line
+					wx[0], wy[0], wz[0] = SectMan.clipBehindPlayer(wx[0], wy[0], wz[0],  wx[1], wy[1], wz[1]) -- Bottom line
+					wx[2], wy[2], wz[2] = SectMan.clipBehindPlayer(wx[2], wy[2], wz[2],  wx[3], wy[3], wz[3]) -- Top line
 				end
 
 				-- Point 2 behing player, clip
 				if wy[1] < 1 then
-					wx[1], wy[1], wz[1] = sectors.clipBehindPlayer(wx[1], wy[1], wz[1],  wx[0], wy[0], wz[0]) -- Bottom line
-					wx[3], wy[3], wz[3] = sectors.clipBehindPlayer(wx[3], wy[3], wz[3],  wx[2], wy[2], wz[2]) -- Top line
+					wx[1], wy[1], wz[1] = SectMan.clipBehindPlayer(wx[1], wy[1], wz[1],  wx[0], wy[0], wz[0]) -- Bottom line
+					wx[3], wy[3], wz[3] = SectMan.clipBehindPlayer(wx[3], wy[3], wz[3],  wx[2], wy[2], wz[2]) -- Top line
 				end
 
 				-- Screen X and Screen Y position
@@ -227,8 +171,9 @@ function sectors.draw()
 				end
 
 
+				-- print(wx[0], wx[1], wy[0], wy[1], wy[2], wy[3], wall.c, sector)
 				-- Draw points
-				walls.draw(wx[0], wx[1], wy[0], wy[1], wy[2], wy[3], wall.c, sector)
+				WallMan.draw(wx[0], wx[1], wy[0], wy[1], wy[2], wy[3], wall.c, sector)
 
 				::continue::
 			end
